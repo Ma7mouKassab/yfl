@@ -83,6 +83,20 @@ jobs:
           for n in ('ic_launcher.xml', 'ic_launcher_round.xml'):
               open(os.path.join(anydpi, n), 'w').write(xml)
           print('icons done')
+          import glob
+          for sp in glob.glob(os.path.join(res, 'drawable*', 'splash.png')):
+              try:
+                  w0, h0 = Image.open(sp).size
+              except Exception:
+                  continue
+              top = Image.new('RGB', (w0, h0), (8, 56, 84))
+              bot = Image.new('RGB', (w0, h0), (4, 26, 43))
+              canvas = Image.composite(bot, top, Image.linear_gradient('L').resize((w0, h0)))
+              side = int(min(w0, h0) * 0.42)
+              ic = src.resize((side, side), Image.LANCZOS)
+              canvas.paste(ic, ((w0 - side) // 2, (h0 - side) // 2), ic)
+              canvas.save(sp)
+          print('splash done')
           PYEOF
           python3 make_icons.py icon.png android/app/src/main/res
 
